@@ -1,1 +1,0 @@
-/opt/homebrew/opt/llvm/bin/clang  -arch arm64 -bundle -Wl,-headerpad_max_install_names -undefined dynamic_lookup -o latin1.so CMakeFiles/latin1.dir/src/latin1.c.o

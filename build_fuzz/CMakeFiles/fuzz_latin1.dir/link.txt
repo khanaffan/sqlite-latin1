@@ -1,1 +1,0 @@
-/opt/homebrew/opt/llvm/bin/clang  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names -fsanitize=fuzzer,address CMakeFiles/fuzz_latin1.dir/test/fuzz_latin1.c.o -o fuzz_latin1  liblatin1_static.a /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libsqlite3.tbd

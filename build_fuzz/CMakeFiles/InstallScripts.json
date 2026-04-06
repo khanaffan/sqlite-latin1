@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
