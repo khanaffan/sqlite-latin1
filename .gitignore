@@ -1,0 +1,23 @@
+# Build directories
+build/
+build_fuzz/
+
+# CMake artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+
+# Compiled outputs
+*.so
+*.dylib
+*.a
+*.o
+
+# Test binaries
+test_*
+fuzz_*
+
+# macOS
+.DS_Store
