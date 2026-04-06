@@ -62,6 +62,22 @@ extern "C" {
  */
 int latin1_register(sqlite3 *db);
 
+/*
+ * Override SQLite's built-in NOCASE collation with the Latin1
+ * case-insensitive collation (LATIN1_CI).
+ *
+ * SQLite's default NOCASE only folds ASCII A-Z; accented characters such as
+ * 'é' and 'É' compare as unequal.  After calling this function, any column
+ * declared COLLATE NOCASE, or any expression using COLLATE NOCASE, will use
+ * Latin1-aware case folding instead.
+ *
+ * Must be called after latin1_register() (or at least after the database
+ * connection is opened).  The override applies only to the given connection.
+ *
+ * Returns SQLITE_OK on success, or a SQLite error code.
+ */
+int latin1_override_nocase(sqlite3 *db);
+
 #ifdef __cplusplus
 }
 #endif

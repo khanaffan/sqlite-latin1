@@ -298,6 +298,15 @@ int latin1_register(sqlite3 *db) {
 }
 
 /* -------------------------------------------------------------------------
+ * NOCASE override
+ * ------------------------------------------------------------------------- */
+
+int latin1_override_nocase(sqlite3 *db) {
+    return sqlite3_create_collation(db, "NOCASE", SQLITE_UTF8,
+                                    NULL, latin1_collate_ci);
+}
+
+/* -------------------------------------------------------------------------
  * Loadable extension entry point
  * Not compiled when SQLITE_CORE is defined (static-link builds).
  * ------------------------------------------------------------------------- */

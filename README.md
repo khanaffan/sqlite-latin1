@@ -15,6 +15,7 @@ SQLite's built-in string functions only handle ASCII. This extension fills the g
 | Scalar function | `latin1_upper(text)` | `UPPER` over the full ISO-8859-1 range |
 | Scalar function | `latin1_lower(text)` | `LOWER` over the full ISO-8859-1 range |
 | Scalar function | `latin1_like(pattern, text [, escape])` | Case-insensitive `LIKE` for Latin1 letters |
+| Override | `latin1_override_nocase(db)` | Replaces SQLite's built-in `NOCASE` collation with Latin1 CI |
 
 ---
 
@@ -79,6 +80,34 @@ SELECT * FROM products WHERE name latin1_like('%naïve%', name);
 SELECT latin1_like('%naïve%', 'Naïve');  -- → 1
 ```
 
+### Overriding the built-in NOCASE collation
+
+SQLite's built-in `NOCASE` only folds ASCII letters (A–Z). Calling
+`latin1_override_nocase()` replaces it with the Latin1 CI collation for the
+lifetime of that connection, so any column declared `COLLATE NOCASE` or any
+`ORDER BY … COLLATE NOCASE` expression automatically gains full ISO-8859-1
+case-folding — no schema changes required.
+
+```sql
+.load ./latin1
+-- (the extension calls latin1_override_nocase() automatically on load)
+
+-- Now NOCASE folds accented letters too
+SELECT 'café' = 'CAFÉ' COLLATE NOCASE;  -- → 1
+
+CREATE TABLE contacts (name TEXT COLLATE NOCASE);
+INSERT INTO contacts VALUES ('Müller'), ('müller');
+SELECT COUNT(*) FROM contacts WHERE name = 'MÜLLER';  -- → 2
+```
+
+From C, call it explicitly after loading the extension or after
+`latin1_register()`:
+
+```c
+latin1_register(db);
+latin1_override_nocase(db);   /* NOCASE is now Latin1 CI for this connection */
+```
+
 ### Declaring a column with a Latin1 collation
 
 ```sql
@@ -109,6 +138,14 @@ latin1_register(db);   // registers all collations and functions
  * Returns SQLITE_OK on success, or a SQLite error code.
  */
 int latin1_register(sqlite3 *db);
+
+/*
+ * Override SQLite's built-in NOCASE collation with the Latin1 CI collation.
+ * Must be called after latin1_register() (or after the connection is opened).
+ * The override applies only to the given connection.
+ * Returns SQLITE_OK on success, or a SQLite error code.
+ */
+int latin1_override_nocase(sqlite3 *db);
 ```
 
 Defined in `src/latin1.h`. Include `src/latin1.c` in your build with `-DSQLITE_CORE` when linking statically against `libsqlite3`.

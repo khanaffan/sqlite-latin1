@@ -480,6 +480,77 @@ static void test_builtin_limitations(sqlite3 *db) {
                    "SELECT (?1 = '\xe9' COLLATE LATIN1_CI)", "\xc9", 1), 1);
 }
 
+/* -------------------------------------------------------------------------
+ * 8. NOCASE override – latin1_override_nocase()
+ *
+ * Opens a fresh in-memory connection so the override does not interfere
+ * with the collation state of the shared db used by other test suites.
+ * ------------------------------------------------------------------------- */
+static void test_nocase_override(void) {
+    sqlite3 *db2;
+    int rc;
+    printf("\n[NOCASE override – latin1_override_nocase()]\n");
+
+    rc = sqlite3_open(":memory:", &db2);
+    if (rc != SQLITE_OK) {
+        FAIL("open fresh db for NOCASE test", "%s", sqlite3_errmsg(db2));
+        sqlite3_close(db2);
+        return;
+    }
+
+    rc = latin1_register(db2);
+    if (rc != SQLITE_OK) {
+        FAIL("latin1_register on fresh db", "%s", sqlite3_errmsg(db2));
+        sqlite3_close(db2);
+        return;
+    }
+
+    /* Before override: built-in NOCASE treats é != É */
+    EXPECT_INT("before override: NOCASE \\xe9 != \\xc9",
+               collation_cmp(db2, "NOCASE", "\xe9", 1, "\xc9", 1), 1);
+
+    rc = latin1_override_nocase(db2);
+    if (rc != SQLITE_OK) {
+        FAIL("latin1_override_nocase()", "%s", sqlite3_errmsg(db2));
+        sqlite3_close(db2);
+        return;
+    }
+    EXPECT_INT("latin1_override_nocase() returns SQLITE_OK", rc, SQLITE_OK);
+
+    /* After override: NOCASE now folds Latin1 accents */
+    EXPECT_INT("after override: NOCASE \\xe9 == \\xc9 (é == É)",
+               collation_cmp(db2, "NOCASE", "\xe9", 1, "\xc9", 1), 0);
+
+    /* ASCII case-folding still works */
+    EXPECT_INT("after override: NOCASE 'a' == 'A'",
+               collation_cmp(db2, "NOCASE", "a", 1, "A", 1), 0);
+    EXPECT_INT("after override: NOCASE 'abc' == 'ABC'",
+               collation_cmp(db2, "NOCASE", "abc", 3, "ABC", 3), 0);
+
+    /* Ordering is preserved: 'a'/'A' < 'b'/'B' */
+    EXPECT_INT("after override: NOCASE 'a' < 'B'",
+               collation_cmp(db2, "NOCASE", "a", 1, "B", 1), -1);
+
+    /* Table with COLLATE NOCASE column picks up the override */
+    sqlite3_exec(db2,
+        "CREATE TABLE words (w TEXT COLLATE NOCASE);"
+        "INSERT INTO words VALUES ('caf\xe9');"   /* café */
+        "INSERT INTO words VALUES ('na\xefve');", /* naïve */
+        NULL, NULL, NULL);
+
+    EXPECT_INT("NOCASE column: caf\\xe9 == CAF\\xc9",
+               sql_int_bind1(db2,
+                   "SELECT COUNT(*) FROM words WHERE w = ?1",
+                   "CAF\xc9", 4), 1);
+
+    EXPECT_INT("NOCASE column: na\\xefve == NA\\xcfVE",
+               sql_int_bind1(db2,
+                   "SELECT COUNT(*) FROM words WHERE w = ?1",
+                   "NA\xcfVE", 5), 1);
+
+    sqlite3_close(db2);
+}
+
 /* =========================================================================
  * main
  * ========================================================================= */
@@ -512,6 +583,7 @@ int main(void) {
     test_like(db);
     test_table_collation(db);
     test_builtin_limitations(db);
+    test_nocase_override();
 
     sqlite3_close(db);
 
