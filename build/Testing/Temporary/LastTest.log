@@ -1,0 +1,93 @@
+Start testing: Apr 06 11:19 EDT
+----------------------------------------------------------
+1/1 Testing: latin1_suite
+1/1 Test: latin1_suite
+Command: "/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build/test_latin1"
+Directory: /Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build
+"latin1_suite" start time: Apr 06 11:19 EDT
+Output:
+----------------------------------------------------------
+=== sqlite-latin1 test suite ===
+
+[LATIN1 – case-sensitive collation]
+  PASS  ASCII upper < lower
+  PASS  'a' > 'B' by byte value
+  PASS  identical strings equal
+  PASS  prefix shorter is less
+  PASS  \xe9 (é) < \xea (ê)
+  PASS  \xc9 (É) < \xe9 (é) – case-sensitive
+  PASS  \xdf (ß) < \xe0 (à)
+
+[LATIN1_CI – case-insensitive collation]
+  PASS  ASCII 'a' == 'A'
+  PASS  \xe9 (é) == \xc9 (É)
+  PASS  \xfc (ü) == \xdc (Ü)
+  PASS  \xf8 (ø) == \xd8 (Ø)
+  PASS  \xdf (ß) == \xdf (ß)
+  PASS  \xff (ÿ) == \xff
+  PASS  \xe9 (é) < \xea (ê) CI
+  PASS  "caf\xe9" CI == "CAF\xc9"
+
+[latin1_upper()]
+  PASS  upper('hello') = 'HELLO'
+  PASS  upper('WORLD') = 'WORLD'
+  PASS  upper(\xe9) byte = 0xC9
+  PASS  upper(\xfc) byte = 0xDC
+  PASS  upper(\xf8) byte = 0xD8
+  PASS  upper(\xdf) (ß) unchanged = 0xDF
+  PASS  upper(\xff) (ÿ) unchanged = 0xFF
+  PASS  upper("h\xe9llo") = "H\xc9LLO"
+  PASS  upper(NULL) is NULL
+
+[latin1_lower()]
+  PASS  lower('HELLO') = 'hello'
+  PASS  lower(\xc9) byte = 0xE9
+  PASS  lower(\xdc) byte = 0xFC
+  PASS  lower(\xd8) byte = 0xF8
+  PASS  lower(\xd7) (×) unchanged = 0xD7
+  PASS  lower(upper(\xe9)) round-trip = 0xE9
+  PASS  lower(NULL) is NULL
+
+[latin1_like()]
+  PASS  'hello' like 'hello'
+  PASS  'HELLO' like 'hello' (CI)
+  PASS  'world' not like 'hello'
+  PASS  '%llo' matches 'hello'
+  PASS  'hel%' matches 'hello'
+  PASS  'h%o' matches 'hello'
+  PASS  '%' matches ''
+  PASS  '%%' matches 'anything'
+  PASS  'h_llo' matches 'hello'
+  PASS  'h_llo' does not match 'hllo'
+  PASS  latin1_like: É matches é
+  PASS  latin1_like: '%�%' matches 'M�ller'
+  PASS  escape: '50!%' matches '50%' with escape='!'
+  PASS  escape: '50!%' does not match '50x' with escape='!'
+  PASS  like(NULL, 'x') is NULL
+  PASS  like('x', NULL) is NULL
+
+[Table COLLATE LATIN1_CI and ORDER BY]
+  PASS  column CI: 'alice' = 'ALICE'
+  PASS  column CI: \xc9lodie = \xe9lodie
+  PASS  ORDER BY returns 5 rows
+  PASS  alice sorts before É/é
+  PASS  É and é are adjacent
+
+[Built-in SQLite UPPER/LIKE limitations with Latin1 bytes]
+  PASS  UPPER(\xe9) is unchanged (ASCII-only – expected limitation)
+  PASS  latin1_upper(\xe9) = 0xC9 (correct)
+  PASS  built-in LIKE: \xc9 LIKE \xe9 = 1 (both →U+FFFD, wrong for Latin1)
+  PASS  latin1_like: '\xe9' ~ '\xc9' = 1 (correct)
+  PASS  BINARY: \xc9 != \xe9
+  PASS  LATIN1_CI: \xc9 == \xe9
+
+=== Results: 58/58 passed ===
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"latin1_suite" end time: Apr 06 11:19 EDT
+"latin1_suite" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Apr 06 11:19 EDT

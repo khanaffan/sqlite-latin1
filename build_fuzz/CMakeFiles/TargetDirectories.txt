@@ -1,0 +1,7 @@
+/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/CMakeFiles/latin1_static.dir
+/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/CMakeFiles/latin1.dir
+/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/CMakeFiles/test_latin1.dir
+/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/CMakeFiles/fuzz_latin1.dir
+/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/CMakeFiles/test.dir
+/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/CMakeFiles/edit_cache.dir
+/Users/affan.khan/bsw/copilot-projects/sqlite-latin1/build_fuzz/CMakeFiles/rebuild_cache.dir

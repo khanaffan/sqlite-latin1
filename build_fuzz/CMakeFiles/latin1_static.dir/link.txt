@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblatin1_static.a CMakeFiles/latin1_static.dir/src/latin1.c.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib liblatin1_static.a
