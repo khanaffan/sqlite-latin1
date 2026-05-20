@@ -318,8 +318,13 @@ __declspec(dllexport)
 int sqlite3_latin1_init(
     sqlite3 *db, char **pzErrMsg, const sqlite3_api_routines *pApi
 ) {
+    int rc;
     SQLITE_EXTENSION_INIT2(pApi);
     (void)pzErrMsg;
-    return latin1_register(db);
+    rc = latin1_register(db);
+    if (rc == SQLITE_OK) {
+        rc = latin1_override_nocase(db);
+    }
+    return rc;
 }
 #endif /* SQLITE_CORE */
